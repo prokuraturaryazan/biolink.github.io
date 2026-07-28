@@ -6,7 +6,7 @@ export const renderLogin = () => `
     <h2 style="text-align:center; margin-bottom: 1.5rem;">Вход</h2>
     <input type="text" id="l-discord" placeholder="Discord ID">
     <input type="password" id="l-pass" placeholder="Пароль">
-    <button class="glow-btn" id="btn-login-action" style="width: 100%; margin-top: 1rem;">Войти</button>
+    <button id="btn-login-action" class="glow-btn" style="width: 100%; margin-top: 1rem;">Войти</button>
     <p style="text-align:center; margin-top:1.5rem;">
       <a href="#/register" class="animated-link">Нет аккаунта? Регистрация</a>
     </p>
