@@ -9,7 +9,7 @@ export const renderLogin = () => `
     <input type="password" id="l-pass" placeholder="Пароль">
     <button class="glow-btn" onclick="login(document.getElementById('l-discord').value, document.getElementById('l-pass').value)" style="width: 100%; margin-top: 1rem;">Войти</button>
     <p style="text-align:center; margin-top:1.5rem;">
-      <a href="/register" data-link class="animated-link">Нет аккаунта? Регистрация</a>
+      <a href="#/register" class="animated-link">Нет аккаунта? Регистрация</a>
     </p>
   </div>
 `;
@@ -24,7 +24,7 @@ export const renderRegister = () => `
       <span>Я принимаю <a href="#" class="animated-link" onclick="window.showTerms && window.showTerms(); return false;">соглашение</a></span>
     </label>
     <button id="btn-reg" class="glow-btn" disabled onclick="register(document.getElementById('r-discord').value, document.getElementById('r-pass').value)" style="width: 100%;">Зарегистрироваться</button>
-    <p style="text-align:center; margin-top:1.5rem;"><a href="/" data-link class="animated-link">Уже есть аккаунт? Войти</a></p>
+    <p style="text-align:center; margin-top:1.5rem;"><a href="#/" class="animated-link">Уже есть аккаунт? Войти</a></p>
   </div>
 `;
 
@@ -44,10 +44,13 @@ export const renderProfile = async (targetUid) => {
   const profile = isOwn ? state.profile : { name: "Загрузка..." };
   let compHtml = '';
   
-  if(!isOwn && state.profile.birthDate && profile.birthDate) {
+  if(!isOwn && state.profile?.birthDate && profile.birthDate) {
     const comp = getCompatibility(state.profile.birthDate, profile.birthDate);
     compHtml = `<div class="compatibility-badge">Совместимость: <b>${comp}%</b></div>`;
   }
+  
+  // Формируем правильную ссылку для копирования с учетом GitHub Pages
+  const shareUrl = window.location.origin + window.location.pathname + '#/profile?uid=' + targetUid;
   
   return `
     <div class="glass-panel scale-in profile-card" style="max-width: 600px; margin: 40px auto; position: relative;">
@@ -63,7 +66,7 @@ export const renderProfile = async (targetUid) => {
       </div>
       <div class="action-row" style="display:flex; justify-content:center; gap: 10px; margin-top:20px;">
         ${isOwn ? '<button class="glow-btn" onclick="navigate(\'/edit-profile\')">Редактировать</button>' : ''}
-        <button class="outline-btn" onclick="navigator.clipboard.writeText(window.location.origin + '/profile?uid=${targetUid}'); alert('Ссылка скопирована!');">Поделиться</button>
+        <button class="outline-btn" onclick="navigator.clipboard.writeText('${shareUrl}'); alert('Ссылка скопирована!');">Поделиться</button>
       </div>
     </div>
   `;
@@ -106,8 +109,7 @@ export const renderChatRoom = (chatId) => `
   </div>
 `;
 
+// Привязываем функции к window для HTML
 window.login = login; 
 window.register = register;
-window.navigate = (path) => { 
-  import('../core/router.js').then(m => m.navigate(path)) 
-};
+window.navigate = (path) => { window.location.hash = path; };
