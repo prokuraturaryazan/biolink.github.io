@@ -172,3 +172,8 @@ input:focus { border-color: var(--primary); background: rgba(255,255,255,0.9); b
 
 .toast { padding: 1rem 1.5rem; margin-top: 0.8rem; border-radius: 12px; color: white; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.2); animation: toastSlide 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
 @keyframes toastSlide { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+#bg-bubbles, .bubble {
+  pointer-events: none;
+  z-index: -1;
+}
