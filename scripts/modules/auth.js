@@ -6,20 +6,27 @@ import { navigate, handleRoute } from '../core/router.js';
 import { showSpinner, hideSpinner, showToast } from '../ui/loader.js';
 
 export const initAuth = () => {
-  onAuthStateChanged(auth, async (user) => {
-    state.user = user;
-    if (user) {
-      const docSnap = await getDoc(doc(db, 'users', user.uid));
-      if (docSnap.exists()) {
-        state.profile = docSnap.data();
-      } else {
-        // Извлекаем Discord ID из технического email
-        const discordId = user.email.split('@')[0];
-        state.profile = { uid: user.uid, discordId: discordId, likesCount: 0, dislikedBy: [] };
-        await setDoc(doc(db, 'users', user.uid), state.profile);
-      }
-    } else { state.profile = null; }
-    handleRoute();
+  // Вешаем глобальный слушатель на весь документ
+  document.addEventListener('click', async (e) => {
+    
+    // Проверяем, что клик был именно по кнопке регистрации
+    // Убедитесь, что ID совпадает с тем, что в renderRegister()
+    if (e.target.id === 'submit-register-btn') {
+      e.preventDefault(); // Останавливаем стандартную перезагрузку страницы
+      
+      // Здесь ваш код получения данных из полей
+      // const email = document.getElementById('reg-email').value;
+      // ... и вызов функции createUserWithEmailAndPassword из Firebase
+      console.log('Кнопка регистрации нажата!'); 
+    }
+  });
+
+  // То же самое для формы входа
+  document.addEventListener('click', async (e) => {
+    if (e.target.id === 'submit-login-btn') {
+      e.preventDefault();
+      // Логика входа
+    }
   });
 };
 
