@@ -1,16 +1,19 @@
 import { state } from './state.js';
 import { renderLogin, renderRegister, renderFeed, renderProfile, renderEditProfile, renderChats, renderChatRoom } from '../ui/render.js';
 import { loadFeed } from '../modules/feed.js';
-// Если будет нужен чат, импортнем позже, пока спасаем рендер
 
-export const navigate = async (path) => {
-  window.history.pushState({}, '', path);
-  await handleRoute();
+export const navigate = (path) => {
+  window.location.hash = path;
 };
 
 export const handleRoute = async () => {
-  const path = window.location.pathname;
-  const searchParams = new URLSearchParams(window.location.search);
+  // Берем путь из хэша (всё что после #). Если пусто — значит мы на главной (/)
+  const fullPath = window.location.hash.slice(1) || '/';
+  
+  // Разделяем путь и параметры (например, /profile?uid=123)
+  const [path, queryString] = fullPath.split('?');
+  const searchParams = new URLSearchParams(queryString || '');
+
   const appDiv = document.getElementById('app');
   const header = document.getElementById('main-header');
 
@@ -18,23 +21,24 @@ export const handleRoute = async () => {
   setTimeout(async () => {
     appDiv.innerHTML = '';
     
-    // Если нет юзера и это не регистрация — на логин
+    // Не авторизован и не на странице регистрации -> логин
     if (!state.user && path !== '/register') {
       header.style.display = 'none';
       appDiv.innerHTML = renderLogin();
     } 
-    // Если нет юзера, но URL регистрации
+    // Не авторизован, но на странице регистрации
     else if (!state.user && path === '/register') {
       header.style.display = 'none';
       appDiv.innerHTML = renderRegister();
     } 
-    // Авторизованная зона
+    // Зона для авторизованных
     else {
       header.style.display = 'flex';
       
-      // Если профиль пуст (зашли только по Discord ID), заставляем заполнить Имя и Город
+      // Форсируем заполнение профиля
       if ((!state.profile?.name || !state.profile?.city) && path !== '/profile' && path !== '/edit-profile') {
         navigate('/edit-profile'); 
+        appDiv.style.opacity = '1';
         return;
       }
       
@@ -58,10 +62,7 @@ export const handleRoute = async () => {
   }, 200);
 };
 
-// Перехват кликов по ссылкам SPA
-document.addEventListener('click', e => {
-  if (e.target.matches('[data-link]')) {
-    e.preventDefault();
-    navigate(e.target.getAttribute('href'));
-  }
-});
+// Слушаем изменение хэша (кнопки "назад/вперед" в браузере тоже будут работать)
+window.addEventListener('hashchange', handleRoute);
+
+// Больше не перехватываем клики вручную, браузер сам меняет хэш у ссылок
