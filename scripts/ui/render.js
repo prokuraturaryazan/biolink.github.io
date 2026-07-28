@@ -1,4 +1,3 @@
-import { login, register } from '../modules/auth.js';
 import { state } from '../core/state.js';
 import { getCompatibility } from '../modules/zodiac.js';
 
@@ -7,7 +6,7 @@ export const renderLogin = () => `
     <h2 style="text-align:center; margin-bottom: 1.5rem;">Вход</h2>
     <input type="text" id="l-discord" placeholder="Discord ID">
     <input type="password" id="l-pass" placeholder="Пароль">
-    <button class="glow-btn" onclick="login(document.getElementById('l-discord').value, document.getElementById('l-pass').value)" style="width: 100%; margin-top: 1rem;">Войти</button>
+    <button class="glow-btn" id="btn-login-action" style="width: 100%; margin-top: 1rem;">Войти</button>
     <p style="text-align:center; margin-top:1.5rem;">
       <a href="#/register" class="animated-link">Нет аккаунта? Регистрация</a>
     </p>
@@ -23,7 +22,7 @@ export const renderRegister = () => `
       <input type="checkbox" id="r-terms" onchange="document.getElementById('btn-reg').disabled = !this.checked"> 
       <span>Я принимаю <a href="#" class="animated-link" onclick="window.showTerms && window.showTerms(); return false;">соглашение</a></span>
     </label>
-    <button id="btn-reg" class="glow-btn" disabled onclick="register(document.getElementById('r-discord').value, document.getElementById('r-pass').value)" style="width: 100%;">Зарегистрироваться</button>
+    <button id="btn-reg" class="glow-btn" disabled style="width: 100%;">Зарегистрироваться</button>
     <p style="text-align:center; margin-top:1.5rem;"><a href="#/" class="animated-link">Уже есть аккаунт? Войти</a></p>
   </div>
 `;
@@ -49,7 +48,6 @@ export const renderProfile = async (targetUid) => {
     compHtml = `<div class="compatibility-badge">Совместимость: <b>${comp}%</b></div>`;
   }
   
-  // Формируем правильную ссылку для копирования с учетом GitHub Pages
   const shareUrl = window.location.origin + window.location.pathname + '#/profile?uid=' + targetUid;
   
   return `
@@ -108,8 +106,3 @@ export const renderChatRoom = (chatId) => `
     </div>
   </div>
 `;
-
-// Привязываем функции к window для HTML
-window.login = login; 
-window.register = register;
-window.navigate = (path) => { window.location.hash = path; };
