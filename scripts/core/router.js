@@ -1,7 +1,7 @@
 import { state } from './state.js';
-import { renderLogin, renderRegister, renderFeed, renderProfile, renderChats, renderChatRoom } from '../ui/render.js';
+import { renderLogin, renderRegister, renderFeed, renderProfile, renderEditProfile, renderChats, renderChatRoom } from '../ui/render.js';
 import { loadFeed } from '../modules/feed.js';
-import { getProfile } from '../modules/profile.js';
+// Если будет нужен чат, импортнем позже, пока спасаем рендер
 
 export const navigate = async (path) => {
   window.history.pushState({}, '', path);
@@ -14,35 +14,47 @@ export const handleRoute = async () => {
   const appDiv = document.getElementById('app');
   const header = document.getElementById('main-header');
 
-  appDiv.style.opacity = '0'; // Fade out transition
+  appDiv.style.opacity = '0'; 
   setTimeout(async () => {
     appDiv.innerHTML = '';
+    
+    // Если нет юзера и это не регистрация — на логин
     if (!state.user && path !== '/register') {
       header.style.display = 'none';
       appDiv.innerHTML = renderLogin();
-    } else if (!state.user && path === '/register') {
+    } 
+    // Если нет юзера, но URL регистрации
+    else if (!state.user && path === '/register') {
       header.style.display = 'none';
       appDiv.innerHTML = renderRegister();
-    } else {
+    } 
+    // Авторизованная зона
+    else {
       header.style.display = 'flex';
-      // Если профиль пуст (первый вход) и мы не на странице редактирования, редирект
-      if (!state.profile?.name && path !== '/profile') {
-        navigate('/profile'); return;
+      
+      // Если профиль пуст (зашли только по Discord ID), заставляем заполнить Имя и Город
+      if ((!state.profile?.name || !state.profile?.city) && path !== '/profile' && path !== '/edit-profile') {
+        navigate('/edit-profile'); 
+        return;
       }
+      
       if (path === '/' || path === '') {
         appDiv.innerHTML = renderFeed();
         await loadFeed(true);
       } else if (path === '/profile') {
         const targetUid = searchParams.get('uid') || state.user.uid;
         appDiv.innerHTML = await renderProfile(targetUid);
+      } else if (path === '/edit-profile') {
+        appDiv.innerHTML = renderEditProfile();
       } else if (path === '/chats') {
         const chatId = searchParams.get('id');
-        if(chatId) appDiv.innerHTML = renderChatRoom(chatId);
-        else appDiv.innerHTML = renderChats();
-      } else { navigate('/'); }
+        appDiv.innerHTML = chatId ? renderChatRoom(chatId) : renderChats();
+      } else { 
+        navigate('/'); 
+      }
     }
-    appDiv.style.transition = 'opacity 0.4s';
-    appDiv.style.opacity = '1'; // Fade in
+    appDiv.style.transition = 'opacity 0.4s ease';
+    appDiv.style.opacity = '1'; 
   }, 200);
 };
 
