@@ -1,12 +1,8 @@
-import { getAuth } from "firebase/auth";
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore"; // Импортируем Firestore
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyDnoZa72N-WLg_YWM88GmlpBcsxtA6aW5k",
   authDomain: "randevu-b6b2e.firebaseapp.com",
@@ -17,6 +13,11 @@ const firebaseConfig = {
   measurementId: "G-KELK8XNVCS"
 };
 
-// Initialize Firebase
+// Инициализируем сервисы Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const db = getFirestore(app); // Создаем экземпляр базы данных
+
+// Экспортируем их, чтобы feed.js и main.js могли их импортировать
+export { app, analytics, auth, db };
